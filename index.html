@@ -122,7 +122,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <main>
   <section class="card">
     <h2><span class="step">1</span>Data petugas &amp; sampel</h2>
-    <p class="muted" style="margin-top:-4px">Dibaca otomatis dari Google Sheets (sheet <b>Petugas</b> dan <b>Sampel</b>). Di claude.ai lewat koneksi Google Drive; di luar claude.ai (mis. GitHub Pages) langsung dari Google Sheets, dengan syarat spreadsheet dibagikan <b>"Siapa saja yang memiliki link"</b> (Viewer).</p>
+    <p class="muted" style="margin-top:-4px">Dibaca otomatis dari Google Sheets (sheet <b>Petugas</b> dan <b>Sampel</b>)</p>
     <div class="row-actions" id="linkRow" style="margin:6px 0 10px;gap:6px;flex-wrap:wrap">
       <input id="sheetLink" type="text" placeholder="Tempel link Google Sheets di sini" style="flex:1;min-width:220px">
       <button id="btnLink">Simpan link &amp; muat</button>
@@ -256,7 +256,7 @@ function kbliCheck(data, k, rs) {
   if (!m) return { level: "warn", text: "Kode KBLI " + k.kode + " tidak ditemukan di master KBLI, jadi kecocokan subsektor tidak bisa diperiksa." };
   if (!m.subsektor) return null;
   if (normSub(m.subsektor) === normSub(rs.subsektor)) return { level: "ok" };
-  return { level: "warn", text: "KBLI " + k.kode + " termasuk subsektor " + m.subsektor + " menurut master KBLI, tidak sesuai dengan subsektor sampel (" + rs.subsektor + ")." +
+  return { level: "warn", text: "KBLI " + k.kode + "Subsektor sampel (" + rs.subsektor + ")." +", KBLI " + k.kode + "tidak sesuai" 
     (k.src === "master" ? " Periksa kembali pilihan Anda." : " Periksa KBLI di sheet Sampel atau pilih KBLI lain.") };
 }
 function findKbli(data, kode) { for (var i = 0; i < data.kbli.length; i++) if (data.kbli[i].kode === kode) return data.kbli[i]; return null; }
@@ -940,8 +940,8 @@ function renderDays() {
           kWrap.appendChild(kInfo);
           var chk = kbliCheck(data, ek, rs);
           if (chk && chk.level === "warn") kWrap.appendChild(el("div", { class: "kbli-warn", text: "⚠ " + chk.text }));
-          else if (chk && chk.level === "ok") kWrap.appendChild(el("div", { class: "kbli-ok", text: "✓ Sesuai subsektor sampel (" + rs.subsektor + ")" }));
-          if (rs && recSub && data.kbli.length) kWrap.appendChild(el("div", { class: "muted", style: "margin-top:4px", text: recs.length ? recs.length + " KBLI direkomendasikan untuk subsektor " + rs.subsektor + " (tampil paling atas, berlatar hijau)." : "Tidak ada KBLI bersubsektor " + rs.subsektor + " di master KBLI. Cek kolom Subsektor di sheet KBLI." }));
+          else if (chk && chk.level === "ok") kWrap.appendChild(el("div", { class: "kbli-ok", text: "✓ Sesuai (" + rs.subsektor + ")" }));
+          if (rs && recSub && data.kbli.length) kWrap.appendChild(el("div", { class: "muted", style: "margin-top:4px", text: recs.length ? recs.length + " teratas rekomendasi KBLI" : "Tidak ada KBLI bersubsektor " + rs.subsektor + " di master KBLI. Cek kolom Subsektor di sheet KBLI." }));
           if (rs && !data.kbli.length) kWrap.appendChild(el("div", { class: "muted", style: "margin-top:4px", text: "Master KBLI belum terbaca: pastikan ada sheet bernama KBLI (kolom Kode KBLI, Judul KBLI, Subsektor), lalu muat ulang data." }));
           g3.appendChild(field("KBLI (ubah bila default salah)", kWrap));
           sb2.appendChild(g3);
