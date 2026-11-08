@@ -80,6 +80,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .cb-opt{padding:7px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid #f1f3f7}
 .cb-opt small{display:block;color:var(--muted);font-size:11.5px}
 .cb-opt.act{background:var(--brand-2)}
+.cb-opt.rec{background:#f1faf4;border-left:3px solid #2e9d5b}
+.cb-opt.rec small{color:#1d7a4f;font-weight:600}
+.kbli-warn{margin-top:6px;border:1px solid #f0c987;background:#fff6e5;color:#7a4a00;border-radius:8px;padding:7px 10px;font-size:12.5px;line-height:1.4}
+.kbli-ok{margin-top:4px;color:#1d7a4f;font-size:12px}
 .cb-opt.none{color:var(--bad);font-weight:600}
 .cb-opt .used{color:var(--warn);font-weight:600}
 .cb-empty{padding:9px 10px;color:var(--muted);font-size:12.5px}
@@ -235,6 +239,26 @@ var ALASAN = [
 
 /* data: {petugas:[{pml,ppl}], sampel:[{id,distrik,kampung,sls,nama,jenis,kbli,judulKbli,subsektor}]} */
 function findSampel(data, id) { for (var i = 0; i < data.sampel.length; i++) if (data.sampel[i].id === id) return data.sampel[i]; return null; }
+var KBLI_SPEC = { kode: ["kodekbli", "kbli", "kode"], judul: ["judulkbli", "judul", "deskripsikbli", "deskripsi", "uraiankbli", "uraian"], subsektor: ["subsektor", "sektor"] };
+function normKode(v) { var k = String(v || "").replace(/\s/g, ""); if (/^\d{1,4}$/.test(k)) k = k.padStart(5, "0"); return k; }
+// KBLI yang dipakai untuk sebuah isian: pilihan user dari master (e.kbli) bila ada, kalau tidak default dari sheet Sampel.
+function effKbli(data, e, rs) {
+  // Subsektor yang dilaporkan = subsektor SAMPEL (bila ada); master hanya sebagai cadangan.
+  if (e && e.kbli) { var m = findKbli(data, e.kbli); if (m) return { kode: m.kode, judul: m.judul, subsektor: (rs && rs.subsektor) || m.subsektor, src: "master" }; }
+  if (rs && rs.kbli) return { kode: rs.kbli, judul: rs.judulKbli, subsektor: rs.subsektor, src: "sampel" };
+  return null;
+}
+function normSub(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
+// Cocokkan subsektor KBLI (menurut master) dengan subsektor sampel. null = tidak bisa diperiksa.
+function kbliCheck(data, k, rs) {
+  if (!k || !rs || !rs.subsektor || !data.kbli.length) return null;
+  var m = findKbli(data, k.kode);
+  if (!m) return { level: "warn", text: "Kode KBLI " + k.kode + " tidak ditemukan di master KBLI, jadi kecocokan subsektor tidak bisa diperiksa." };
+  if (!m.subsektor) return null;
+  if (normSub(m.subsektor) === normSub(rs.subsektor)) return { level: "ok" };
+  return { level: "warn", text: "KBLI " + k.kode + " termasuk subsektor " + m.subsektor + " menurut master KBLI, tidak sesuai dengan subsektor sampel (" + rs.subsektor + ")." +
+    (k.src === "master" ? " Periksa kembali pilihan Anda." : " Periksa KBLI di sheet Sampel atau pilih KBLI lain.") };
+}
 function findKbli(data, kode) { for (var i = 0; i < data.kbli.length; i++) if (data.kbli[i].kode === kode) return data.kbli[i]; return null; }
 function kampungKey(distrik, kampung) { return (distrik || "") + "|" + kampung; }
 function splitKey(k) { var p = k.split("|"); return { distrik: p[0], kampung: p.slice(1).join("|") }; }
@@ -274,12 +298,13 @@ function entryResult(e, data) {
   var temu = d && d.t ? d.t(resp.nama) : (trimDot(e.ditemuiLain) || "Bapak " + resp.nama);
   var t = resp.nama + " berhasil didata lengkap, kami menemui " + temu + ".";
   if (ganti) t += " Responden ini merupakan sampel pengganti dari " + asli.nama + " dikarenakan " + alasan + ".";
-  var k = resp.kbli ? { kode: resp.kbli, judul: resp.judulKbli, subsektor: resp.subsektor } : null;
+  var k = effKbli(data, e, resp);
   if (k) {
     t += (k.subsektor ? " Responden ini mewakili subsektor " + k.subsektor + " dengan hasil" : " Hasil") +
       " pendataan ditemukan bahwa pekerjaan utama beliau memiliki kode KBLI " + k.kode + "/" + k.judul + ".";
   }
-  return { ok: true, incomplete: !k, sls: uniq([asli.sls, resp.sls]), text: t };
+  var chk = kbliCheck(data, k, resp);
+  return { ok: true, incomplete: !k, kbliWarn: chk && chk.level === "warn" ? chk.text : "", sls: uniq([asli.sls, resp.sls]), text: t };
 }
 
 /* state: {pml,tujuan,tglAwal,tglAkhir,noST,transport,days:{iso:{blocks:[{ppl,kampung,entries:[]}],catatan,kembali}},visum:{key:title}} */
@@ -347,7 +372,8 @@ function buildModel(state, data) {
       }
       first = false;
       var ok = res.filter(function (r) { return r.ok; }).length;
-      res.forEach(function (r, i) { if (r.incomplete) warnings.push(hariTgl(iso) + ", PPL " + ppl + ": sampel no. " + (i + 1) + " belum lengkap (sampel pengganti belum dipilih / KBLI kosong di spreadsheet)."); });
+      res.forEach(function (r, i) { if (r.incomplete) warnings.push(hariTgl(iso) + ", PPL " + ppl + ": sampel no. " + (i + 1) + " belum lengkap (sampel pengganti belum dipilih / KBLI kosong: pilih KBLI dari master atau isi di sheet Sampel)."); });
+      res.forEach(function (r, i) { if (r.kbliWarn) warnings.push(hariTgl(iso) + ", PPL " + ppl + ": sampel no. " + (i + 1) + " - " + r.kbliWarn); });
       var jumlah = ok === res.length ? ok + " responden" : ok + " dari " + res.length + " sampel";
       items.push({ type: "bullet", text: "Kami menjelaskan maksud dan tujuan pendataan kepada responden, mengidentifikasi keberadaan rumah tangga dan UTP melalui aplikasi FASIH mobile. Kami berhasil melakukan pendataan " + jumlah + " dengan rincian sebagai berikut." });
       res.forEach(function (r, i) { items.push({ type: "num", n: i + 1, text: r.text }); });
@@ -568,7 +594,12 @@ function parseWorkbook(wb, fname) {
     return { id: id, distrik: properCase(cleanName(r.distrik, "distrik")), kampung: properCase(cleanName(r.kampung, "kampung")), sls: cleanName(r.sls, "sls"), nama: cleanName(r.nama), jenis: cleanName(r.jenis),
       kbli: k, judulKbli: cleanName(r.judulKbli), subsektor: cleanName(r.subsektor) };
   });
-  return { petugas: pet, sampel: smp, kbli: [], file: fname };
+  var master = [], seenK = {};
+  tableFrom(pickSheet(wb, ["kbli", "masterkbli"]), KBLI_SPEC).forEach(function (r) {
+    var kode = normKode(r.kode); if (!kode || seenK[kode]) return; seenK[kode] = 1;
+    master.push({ kode: kode, judul: cleanName(r.judul), subsektor: cleanName(r.subsektor) });
+  });
+  return { petugas: pet, sampel: smp, kbli: master, file: fname };
 }
 function sheetId(url) { var m = String(url).match(/\/d\/([A-Za-z0-9_-]{20,})/); return m ? m[1] : (/^[A-Za-z0-9_-]{20,}$/.test(url) ? url : ""); }
 function b64ToBytes(b64) { var bin = atob(String(b64).replace(/\s/g, "")), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
@@ -633,16 +664,23 @@ function jsonpSheet(id, name) {
     document.head.appendChild(sc);
   });
 }
+function kbliOptional(fn, id, refresh) {
+  // Sheet master KBLI bersifat opsional: bila tidak ada/ gagal dibaca, abaikan saja (jangan menggagalkan pemuatan).
+  return Promise.all(["KBLI", "Master KBLI"].map(function (n) {
+    return fn(id, n, refresh).then(function (sh) { return tableFrom(sh, KBLI_SPEC).length ? sh : null; }, function () { return null; });
+  })).then(function (arr) { return arr.filter(Boolean)[0] || null; });
+}
 function viaSheets(id, refresh) {
   function book(r) {
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, r[0], "Petugas");
     XLSX.utils.book_append_sheet(wb, r[1], "Sampel");
+    if (r[2]) XLSX.utils.book_append_sheet(wb, r[2], "KBLI");
     return { wb: wb, title: "Google Sheets", at: Date.now() };
   }
-  return Promise.all([jsonpSheet(id, "Petugas"), jsonpSheet(id, "Sampel")]).then(book, function (e1) {
+  return Promise.all([jsonpSheet(id, "Petugas"), jsonpSheet(id, "Sampel"), kbliOptional(jsonpSheet, id, refresh)]).then(book, function (e1) {
     console.warn("Jalur script gagal, mencoba fetch CSV:", e1);
-    return Promise.all([fetchCsvSheet(id, "Petugas", refresh), fetchCsvSheet(id, "Sampel", refresh)]).then(book, function (e2) { throw (e2 && e2.code === "network") ? e1 : e2; });
+    return Promise.all([fetchCsvSheet(id, "Petugas", refresh), fetchCsvSheet(id, "Sampel", refresh), kbliOptional(fetchCsvSheet, id, refresh)]).then(book, function (e2) { throw (e2 && e2.code === "network") ? e1 : e2; });
   });
 }
 function applyWorkbook(wb, title, at) {
@@ -860,15 +898,15 @@ function renderDays() {
         row.appendChild(el("div", { class: "no", text: (ei + 1) + "." }));
         var c = el("div");
         var g = el("div", { class: "ent-g" });
-        g.appendChild(field("Nama sampel", combo({ options: sampleOpts(b.kampung, used, e.sampel), value: e.sampel, placeholder: b.kampung ? "Cari nama sampel…" : "Pilih kampung dulu / cari…", onChange: function (v) { e.sampel = v; changed(true); } })));
-        g.appendChild(field("Keterangan", sel([{ value: "ya", label: "Eligible" }, { value: "tidak", label: "Tidak eligible" }], e.eligible, function (v) { e.eligible = v; changed(true); })));
+        g.appendChild(field("Nama sampel", combo({ options: sampleOpts(b.kampung, used, e.sampel), value: e.sampel, placeholder: b.kampung ? "Cari nama sampel…" : "Pilih kampung dulu / cari…", onChange: function (v) { e.sampel = v; e.kbli = ""; changed(true); } })));
+        g.appendChild(field("Keterangan", sel([{ value: "ya", label: "Eligible" }, { value: "tidak", label: "Tidak eligible" }], e.eligible, function (v) { e.eligible = v; e.kbli = ""; changed(true); })));
         c.appendChild(g);
         if (e.eligible === "tidak") {
           var sb = el("div", { class: "sub" }), g2 = el("div", { class: "ent-g full" });
           var alasanSel = sel(ALASAN.map(function (a) { return { value: a, label: a.charAt(0).toUpperCase() + a.slice(1) }; }).concat([{ value: "Lain", label: "Lainnya (tulis sendiri)…" }]), e.alasan, function (v) { e.alasan = v; changed(true); });
           g2.appendChild(field("Alasan tidak eligible", alasanSel));
           var po = [{ value: NONE, label: "Tidak dapat sampel pengganti", cls: "none" }].concat(sampleOpts(b.kampung, used, e.pengganti).filter(function (o) { return o.value !== e.sampel; }));
-          g2.appendChild(field("Sampel pengganti", combo({ options: po, value: e.pengganti, placeholder: "Cari sampel pengganti…", onChange: function (v) { e.pengganti = v; changed(true); } })));
+          g2.appendChild(field("Sampel pengganti", combo({ options: po, value: e.pengganti, placeholder: "Cari sampel pengganti…", onChange: function (v) { e.pengganti = v; e.kbli = ""; changed(true); } })));
           sb.appendChild(g2);
           if (e.alasan === "Lain") {
             var ta = el("input", { type: "text", placeholder: "contoh: ruta tersebut sudah pindah ke kampung lain" }); ta.value = e.alasanLain || "";
@@ -885,10 +923,27 @@ function renderDays() {
             { value: "Suami", label: "Suami dari keluarga [nama]" }, { value: "Anak", label: "Anak dari keluarga [nama]" },
             { value: "ART", label: "Anggota ruta dari keluarga [nama]" }, { value: "Lain", label: "Lainnya (tulis sendiri)…" }], e.ditemui, function (v) { e.ditemui = v; changed(true); })));
           var rs = findSampel(data, e.eligible === "ya" ? e.sampel : e.pengganti);
-          var kInfo = el("div", { class: "kbli-info" });
-          if (rs && rs.kbli) { kInfo.appendChild(el("b", { text: rs.kbli + " — " + (rs.judulKbli || "") })); kInfo.appendChild(el("div", { class: "muted", text: rs.subsektor ? "Subsektor " + rs.subsektor : "" })); }
-          else kInfo.appendChild(el("span", { class: "muted", text: rs ? "KBLI kosong di spreadsheet untuk sampel ini" : "Pilih sampel dulu" }));
-          g3.appendChild(field("KBLI (dari spreadsheet)", kInfo));
+          var ek = effKbli(data, e, rs), kWrap = el("div");
+          var defLabel = "Default sheet Sampel: " + (rs && rs.kbli ? rs.kbli + " — " + (rs.judulKbli || "") : (rs ? "(kosong)" : "pilih sampel dulu"));
+          var recSub = rs && rs.subsektor ? normSub(rs.subsektor) : "", recs = [], others = [];
+          data.kbli.forEach(function (k) {
+            var o = { value: k.kode, label: k.kode + " — " + k.judul, hint: k.subsektor ? "Subsektor " + k.subsektor : "" };
+            if (recSub && normSub(k.subsektor) === recSub) { o.cls = "rec"; o.hint = "Rekomendasi · Subsektor " + k.subsektor; recs.push(o); } else others.push(o);
+          });
+          var kOpts = [{ value: "", label: defLabel, cls: "none" }].concat(recs, others);
+          if (rs) kWrap.appendChild(combo({ options: kOpts, value: e.kbli || "", placeholder: "Cari KBLI dari master (kode atau judul)…", onChange: function (v) { e.kbli = v; changed(true); } }));
+          var kInfo = el("div", { class: "kbli-info", style: rs ? "margin-top:6px" : "" });
+          if (ek) {
+            kInfo.appendChild(el("b", { text: ek.kode + " — " + (ek.judul || "") }));
+            kInfo.appendChild(el("div", { class: "muted", text: (ek.subsektor ? "Subsektor " + ek.subsektor + " · " : "") + (ek.src === "master" ? "dipilih dari master KBLI" : "default dari sheet Sampel") }));
+          } else kInfo.appendChild(el("span", { class: "muted", text: rs ? "KBLI kosong di sheet Sampel: pilih dari master KBLI" : "Pilih sampel dulu" }));
+          kWrap.appendChild(kInfo);
+          var chk = kbliCheck(data, ek, rs);
+          if (chk && chk.level === "warn") kWrap.appendChild(el("div", { class: "kbli-warn", text: "⚠ " + chk.text }));
+          else if (chk && chk.level === "ok") kWrap.appendChild(el("div", { class: "kbli-ok", text: "✓ Sesuai subsektor sampel (" + rs.subsektor + ")" }));
+          if (rs && recSub && data.kbli.length) kWrap.appendChild(el("div", { class: "muted", style: "margin-top:4px", text: recs.length ? recs.length + " KBLI direkomendasikan untuk subsektor " + rs.subsektor + " (tampil paling atas, berlatar hijau)." : "Tidak ada KBLI bersubsektor " + rs.subsektor + " di master KBLI. Cek kolom Subsektor di sheet KBLI." }));
+          if (rs && !data.kbli.length) kWrap.appendChild(el("div", { class: "muted", style: "margin-top:4px", text: "Master KBLI belum terbaca: pastikan ada sheet bernama KBLI (kolom Kode KBLI, Judul KBLI, Subsektor), lalu muat ulang data." }));
+          g3.appendChild(field("KBLI (ubah bila default salah)", kWrap));
           sb2.appendChild(g3);
           if (e.ditemui === "Lain") {
             var tl = el("input", { type: "text", placeholder: "contoh: Ibu Mardiana" }); tl.value = e.ditemuiLain || "";
