@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generator Laporan Perjalanan Dinas SPDT-NTP 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<style>
+:root{
+  --ink:#14213a; --muted:#5b6780; --line:#dde3ee; --bg:#f4f6fa; --card:#fff;
+  --brand:#0b4f8a; --brand-2:#e8f1fb; --accent:#e07a1f; --ok:#1d7a4f; --warn:#a85d00; --bad:#b3261e;
+  --r:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Plus Jakarta Sans",system-ui,sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.45}
+header.top{background:var(--brand);color:#fff;padding:18px 24px 16px}
+header.top h1{margin:0;font-size:19px;font-weight:700;letter-spacing:.2px}
+header.top p{margin:3px 0 0;opacity:.85;font-size:13px}
+.wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;padding:20px 24px 60px;max-width:1500px;margin:0 auto}
+@media (max-width:1050px){.wrap{grid-template-columns:1fr}.preview-col{position:static!important;max-height:none!important}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-bottom:16px}
+.card h2{font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+.step{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-weight:700;flex:none}
+label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:640px){.grid2,.grid3{grid-template-columns:1fr}}
+.fld{margin-bottom:12px}
+input[type=text],input[type=date],select,textarea{width:100%;font:inherit;color:inherit;border:1px solid #c9d2e0;border-radius:8px;padding:8px 10px;background:#fff}
+textarea{resize:vertical;min-height:60px}
+input:focus,select:focus,textarea:focus{outline:2px solid #9cc3ea;border-color:var(--brand)}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:#fff;padding:7px 12px;color:var(--ink)}
+button:hover{border-color:#aab6c9}
+button.pri{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:600}
+button.pri:hover{background:#093f6e}
+button.big{padding:11px 18px;font-size:15px}
+button.ghost{border-style:dashed;color:var(--brand);background:var(--brand-2);border-color:#a9c7e8}
+button.x{border:none;background:none;color:var(--muted);padding:4px 8px;font-size:16px;line-height:1}
+button.x:hover{color:var(--bad)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.unused-drop{border:2px dashed #b8c6db;border-radius:var(--r);padding:16px;text-align:center;background:#fafcff;color:var(--muted)}
+.drop.over{border-color:var(--brand);background:var(--brand-2)}
+.stat{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pill{font-size:12px;border-radius:999px;padding:3px 10px;background:var(--brand-2);color:var(--brand);font-weight:600}
+.pill.bad{background:#fdecea;color:var(--bad)}
+.muted{color:var(--muted);font-size:12.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:13px;cursor:pointer;user-select:none;background:#fff}
+.chip input{margin:0}
+.chip.on{background:var(--brand-2);border-color:#a9c7e8;color:var(--brand);font-weight:600}
+.distrik-lbl{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:8px 0 5px}
+.team{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.team span{font-size:12.5px;background:#f0f3f8;border-radius:6px;padding:3px 8px}
+.team span b{color:var(--brand)}
+.day{border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px;overflow:visible;background:#fff}
+.day-h{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f7f9fc;border-bottom:1px solid var(--line);border-radius:var(--r) var(--r) 0 0}
+.day-h b{font-size:14px}
+.day-h .tag{font-size:11.5px;color:var(--muted)}
+.day-b{padding:12px 14px}
+.blk{border:1px solid #e4e9f2;border-left:4px solid var(--brand);border-radius:8px;padding:10px 12px;margin-bottom:10px;background:#fcfdff}
+.blk-h{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:8px}
+.ent{border-top:1px dashed #dbe2ec;padding:10px 0 4px;display:grid;grid-template-columns:28px 1fr auto;gap:8px}
+.ent .no{font-weight:700;color:var(--brand);padding-top:24px;text-align:center}
+.ent-g{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+.ent-g.full{grid-template-columns:1fr 1fr}
+@media (max-width:640px){.ent-g,.ent-g.full,.blk-h{grid-template-columns:1fr}}
+.sub{background:#fff7ee;border:1px solid #f3d9b9;border-radius:8px;padding:8px;margin-top:8px}
+.sub.ok{background:#f1f8f4;border-color:#cde6d7}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:8px}
+/* combobox */
+.cb{position:relative}
+.cb input{padding-right:28px}
+.cb .caret{position:absolute;right:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:11px}
+.cb-list{position:absolute;z-index:50;left:0;right:0;top:calc(100% + 3px);background:#fff;border:1px solid #c9d2e0;border-radius:8px;box-shadow:0 8px 24px rgba(20,33,58,.14);max-height:260px;overflow:auto;display:none}
+.cb.open .cb-list{display:block}
+.cb-opt{padding:7px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid #f1f3f7}
+.cb-opt small{display:block;color:var(--muted);font-size:11.5px}
+.cb-opt.act{background:var(--brand-2)}
+.cb-opt.none{color:var(--bad);font-weight:600}
+.cb-opt .used{color:var(--warn);font-weight:600}
+.cb-empty{padding:9px 10px;color:var(--muted);font-size:12.5px}
+/* preview */
+.preview-col{position:sticky;top:12px;align-self:start;max-height:calc(100vh - 24px);display:flex;flex-direction:column}
+.pv-card{display:flex;flex-direction:column;min-height:0;flex:1}
+.pv-scroll{overflow:auto;flex:1;min-height:200px;background:#e9edf3;border-radius:8px;padding:14px}
+.paper{background:#fff;padding:22px 20px;box-shadow:0 1px 4px rgba(0,0,0,.12);font-family:Arial,Helvetica,sans-serif;font-size:11.5px;color:#000;line-height:1.38}
+.paper table{width:100%;border-collapse:collapse;table-layout:fixed}
+.paper td{border:1px solid #000;padding:4px 6px;vertical-align:top}
+.paper .ctr{text-align:center;font-weight:700}
+.paper .lv{display:grid;grid-template-columns:92px 10px 1fr}
+.paper ul{margin:2px 0 2px;padding-left:22px}
+.paper ol{margin:2px 0 6px;padding-left:40px}
+.paper li{text-align:justify;margin:0}
+.paper .dh{font-weight:700;margin-top:10px}
+.paper .dh:first-child{margin-top:0}
+.paper .gap{height:8px}
+.warns{margin:10px 0 0;padding:10px 12px 10px 28px;background:#fff8ec;border:1px solid #f1d6ad;border-radius:8px;color:#6b4300;font-size:12.5px;max-height:130px;overflow:auto}
+.dl-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.toast{font-size:12.5px}
+.toast.ok{color:var(--ok)} .toast.bad{color:var(--bad)}
+.msg{width:100%;font-size:12.5px;color:var(--brand);padding:2px 0}
+.msg.bad{color:var(--bad);font-weight:600}
+.kbli-info{border:1px solid #cde6d7;background:#fff;border-radius:8px;padding:7px 10px;min-height:38px;font-size:13px}
+.empty-state{padding:18px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Generator Laporan Perjalanan Dinas · SPDT-NTP 2026</h1>
+  <p>BPS Kabupaten Raja Ampat — isi formulir, cek pratinjau, lalu unduh laporan dalam format Word (.docx).</p>
+</header>
+
+<div class="wrap">
+<main>
+  <section class="card">
+    <h2><span class="step">1</span>Data petugas &amp; sampel</h2>
+    <p class="muted" style="margin-top:-4px">Dibaca otomatis dari Google Sheets (sheet <b>Petugas</b> dan <b>Sampel</b>). Di claude.ai lewat koneksi Google Drive; di luar claude.ai (mis. GitHub Pages) langsung dari Google Sheets, dengan syarat spreadsheet dibagikan <b>"Siapa saja yang memiliki link"</b> (Viewer).</p>
+    <div class="row-actions" id="linkRow" style="margin:6px 0 10px;gap:6px;flex-wrap:wrap">
+      <input id="sheetLink" type="text" placeholder="Tempel link Google Sheets di sini" style="flex:1;min-width:220px">
+      <button id="btnLink">Simpan link &amp; muat</button>
+    </div>
+    <div class="row-actions" style="margin:0 0 10px">
+      <label class="muted" for="fileXlsx" style="margin-right:6px">Atau:</label>
+      <input id="fileXlsx" type="file" accept=".xlsx,.xls,.csv">
+    </div>
+    <div class="stat" id="dataStat"></div>
+    <div class="row-actions" style="margin-top:10px">
+      <button id="btnReload">Muat ulang data spreadsheet</button>
+      <button id="btnReset">Mulai baru (hapus isian)</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="step">2</span>Identitas surat tugas</h2>
+    <div class="grid2">
+      <div class="fld"><label class="f">Nama PML</label><select id="pml"></select></div>
+      <div class="fld"><label class="f">Nomor Surat Tugas</label><input type="text" id="noST" placeholder="B-742/668870-92800/KP-650/10/2026"></div>
+    </div>
+    <div id="teamBox" class="muted"></div>
+    <div class="fld" style="margin-top:12px">
+      <label class="f">Kampung tujuan tugas (pilih sesuai urutan kunjungan)</label>
+      <div id="kampungBox"></div>
+    </div>
+    <div class="fld">
+      <label class="f">Tujuan <span style="font-weight:400">— otomatis tersusun dari kampung terpilih, boleh diedit</span></label>
+      <textarea id="tujuan" rows="2" placeholder="Kampung Wailen Distrik Salawati Tengah, Kampung Samate, Kampung Waidim Distrik Salawati Utara."></textarea>
+      <div class="row-actions"><button id="btnTujuan" class="ghost">Susun ulang dari kampung terpilih</button></div>
+    </div>
+    <div class="grid3">
+      <div class="fld"><label class="f">Tanggal awal surat tugas</label><input type="date" id="tglAwal"></div>
+      <div class="fld"><label class="f">Tanggal akhir surat tugas</label><input type="date" id="tglAkhir"></div>
+      <div class="fld"><label class="f">Transportasi</label><input type="text" id="transport" value="perahu"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="step">3</span>Laporan kegiatan harian</h2>
+    <div id="days"></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="step">4</span>Penanda tangan visum per kampung</h2>
+    <p class="muted" style="margin-top:-4px">Muncul otomatis dari kampung yang dikunjungi. Dipakai pada kalimat "kami menemui aparat kampung yaitu …".</p>
+    <div id="visumBox"></div>
+    <datalist id="visumList"><option value="Kepala Kampung"><option value="Sekretaris Kampung"><option value="Ketua Bamuskam"><option value="Kepala Distrik"><option value="Aparat Kampung"></datalist>
+  </section>
+</main>
+
+<aside class="preview-col">
+  <section class="card pv-card">
+    <h2><span class="step">5</span>Pratinjau &amp; unduh</h2>
+    <div class="pv-scroll"><div class="paper" id="paper"></div></div>
+    <ul class="warns" id="warns" style="display:none"></ul>
+    <div class="dl-row">
+      <button class="pri big" id="btnDl">Unduh Laporan (.docx)</button>
+      <span class="toast" id="toast"></span>
+    </div>
+  </section>
+</aside>
+</div>
+
+<script>
+/* ===== Core: narrative model + DOCX builder (shared by browser & tests) ===== */
+var HARI = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+var BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+var PERIHAL = "Pendataan Lapangan Survei Penyempurnaan Diagram Timbang Nilai Tukar Petani (SPDT NTP) Tahun 2026";
+var NAMA_SURVEI = "Survei Penyempurnaan Diagram Timbang Nilai Tukar Petani (SPDT NTP) Tahun 2026";
+var NONE = "__NONE__";
+
+function parseISO(s) { var p = String(s).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function toISO(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function tglIndo(iso) { var d = parseISO(iso); return d.getDate() + " " + BULAN[d.getMonth()] + " " + d.getFullYear(); }
+function hariTgl(iso) { var d = parseISO(iso); return HARI[d.getDay()] + ", " + tglIndo(iso); }
+function dateRange(a, b) {
+  var out = []; if (!a || !b) return out;
+  var d = parseISO(a), e = parseISO(b); if (d > e) return out;
+  var guard = 0;
+  while (d <= e && guard++ < 62) { out.push(toISO(d)); d.setDate(d.getDate() + 1); }
+  return out;
+}
+function joinDan(arr) {
+  arr = arr.filter(Boolean);
+  if (arr.length <= 1) return arr.join("");
+  if (arr.length === 2) return arr[0] + " dan " + arr[1];
+  return arr.slice(0, -1).join(", ") + ", dan " + arr[arr.length - 1];
+}
+function uniq(arr) { var s = {}, o = []; arr.forEach(function (x) { if (x && !s[x]) { s[x] = 1; o.push(x); } }); return o; }
+function slsSort(a, b) { return String(a).localeCompare(String(b), "id", { numeric: true }); }
+function lcFirst(s) { return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+function visumLower(v) { return String(v).split(" ").map(function (w) { return /^(kepala|kampung|sekretaris|ketua|aparat|distrik|wakil|bendahara|kaur|kasi)$/i.test(w) ? w.toLowerCase() : w; }).join(" "); }
+function trimDot(s) { return String(s || "").trim().replace(/[.\s]+$/, ""); }
+
+var DITEMUI = [
+  { v: "Bapak", t: function (n) { return "Bapak " + n; } },
+  { v: "Ibu", t: function (n) { return "Ibu " + n; } },
+  { v: "Istri", t: function (n) { return "Istri dari keluarga " + n; } },
+  { v: "Suami", t: function (n) { return "Suami dari keluarga " + n; } },
+  { v: "Anak", t: function (n) { return "Anak dari keluarga " + n; } },
+  { v: "ART", t: function (n) { return "anggota rumah tangga dari keluarga " + n; } },
+  { v: "Lain", t: null }
+];
+var ALASAN = [
+  "ruta tersebut tidak Eligible",
+  "ruta tersebut sedang berada di luar kota dan tidak bisa ditemui hingga batas pencacahan",
+  "ruta tersebut sudah tidak mengusahakan UTP tersebut",
+  "KRT sudah meninggal dan keluarganya tidak melanjutkan UTP tersebut",
+  "ruta tersebut hanya menjual hasil produksi",
+  "ruta tersebut sudah pindah",
+  "ruta tersebut menolak untuk didata"
+];
+
+/* data: {petugas:[{pml,ppl}], sampel:[{id,distrik,kampung,sls,nama,jenis,kbli,judulKbli,subsektor}]} */
+function findSampel(data, id) { for (var i = 0; i < data.sampel.length; i++) if (data.sampel[i].id === id) return data.sampel[i]; return null; }
+function findKbli(data, kode) { for (var i = 0; i < data.kbli.length; i++) if (data.kbli[i].kode === kode) return data.kbli[i]; return null; }
+function kampungKey(distrik, kampung) { return (distrik || "") + "|" + kampung; }
+function splitKey(k) { var p = k.split("|"); return { distrik: p[0], kampung: p.slice(1).join("|") }; }
+
+function teamOf(data, pml) {
+  return data.petugas.filter(function (r) { return r.pml === pml; }).map(function (r) { return r.ppl; }).filter(Boolean);
+}
+
+function tujuanFromKampung(keys) {
+  // keys in order; group consecutive by distrik: "Kampung A, Kampung B Distrik X, Kampung C Distrik Y."
+  var groups = [];
+  keys.forEach(function (k) {
+    var o = splitKey(k);
+    var g = groups.length && groups[groups.length - 1].distrik === o.distrik ? groups[groups.length - 1] : null;
+    if (!g) { g = { distrik: o.distrik, list: [] }; groups.push(g); }
+    g.list.push("Kampung " + o.kampung);
+  });
+  return groups.map(function (g) { return g.list.join(", ") + (g.distrik ? " Distrik " + g.distrik : ""); }).join(", ") + (groups.length ? "." : "");
+}
+
+function entryResult(e, data) {
+  // returns {ok:bool, nama, text, sls[]}
+  var asli = findSampel(data, e.sampel);
+  if (!asli) return null;
+  var alasan = trimDot(e.alasan === "Lain" ? e.alasanLain : e.alasan) || "ruta tersebut tidak Eligible";
+  var resp = asli, ganti = null;
+  if (e.eligible === "tidak") {
+    if (!e.pengganti || e.pengganti === NONE) {
+      return { ok: false, sls: [asli.sls], text: asli.nama + " tidak dapat didata dikarenakan " + alasan + " dan tidak terdapat sampel pengganti." };
+    }
+    ganti = findSampel(data, e.pengganti);
+    if (!ganti) return { ok: false, incomplete: true, sls: [asli.sls], text: asli.nama + " — (sampel pengganti belum dipilih)" };
+    resp = ganti;
+  }
+  var d = null;
+  for (var i = 0; i < DITEMUI.length; i++) if (DITEMUI[i].v === e.ditemui) d = DITEMUI[i];
+  var temu = d && d.t ? d.t(resp.nama) : (trimDot(e.ditemuiLain) || "Bapak " + resp.nama);
+  var t = resp.nama + " berhasil didata lengkap, kami menemui " + temu + ".";
+  if (ganti) t += " Responden ini merupakan sampel pengganti dari " + asli.nama + " dikarenakan " + alasan + ".";
+  var k = resp.kbli ? { kode: resp.kbli, judul: resp.judulKbli, subsektor: resp.subsektor } : null;
+  if (k) {
+    t += (k.subsektor ? " Responden ini mewakili subsektor " + k.subsektor + " dengan hasil" : " Hasil") +
+      " pendataan ditemukan bahwa pekerjaan utama beliau memiliki kode KBLI " + k.kode + "/" + k.judul + ".";
+  }
+  return { ok: true, incomplete: !k, sls: uniq([asli.sls, resp.sls]), text: t };
+}
+
+/* state: {pml,tujuan,tglAwal,tglAkhir,noST,transport,days:{iso:{blocks:[{ppl,kampung,entries:[]}],catatan,kembali}},visum:{key:title}} */
+function visitedKampung(state) {
+  var out = [];
+  dateRange(state.tglAwal, state.tglAkhir).forEach(function (iso) {
+    var d = state.days[iso]; if (!d) return;
+    d.blocks.forEach(function (b) { if (b.kampung && out.indexOf(b.kampung) < 0) out.push(b.kampung); });
+  });
+  return out;
+}
+
+function buildModel(state, data) {
+  var tim = [state.pml].concat(teamOf(data, state.pml)).filter(Boolean);
+  var dates = dateRange(state.tglAwal, state.tglAkhir);
+  var transport = state.transport || "perahu";
+  var warnings = [];
+
+  // last occurrence of each kampung + all SLS per kampung
+  var lastIdx = {}, slsK = {}, seq = 0;
+  dates.forEach(function (iso) {
+    var d = state.days[iso]; if (!d) return;
+    d.blocks.forEach(function (b) {
+      seq++;
+      if (!b.kampung) return;
+      lastIdx[b.kampung] = seq;
+      (b.entries || []).forEach(function (e) {
+        var r = entryResult(e, data); if (r) slsK[b.kampung] = (slsK[b.kampung] || []).concat(r.sls);
+      });
+    });
+  });
+
+  var days = [], visited = {}, loc = null, firstTravel = true; seq = 0;
+  dates.forEach(function (iso, di) {
+    var d = state.days[iso] || { blocks: [], catatan: "" };
+    var items = []; // {type:'bullet'|'num'|'gap', text}
+    var first = true;
+    d.blocks.forEach(function (b, bi) {
+      seq++;
+      if (!b.kampung) { warnings.push(hariTgl(iso) + ": blok PPL ke-" + (bi + 1) + " belum memilih kampung."); return; }
+      var kk = splitKey(b.kampung);
+      var res = (b.entries || []).map(function (e) { return entryResult(e, data); }).filter(Boolean);
+      var sls = uniq([].concat.apply([], res.map(function (r) { return r.sls; }))).sort(slsSort);
+      var slsTxt = sls.length ? "SLS " + joinDan(sls) : "SLS tersebut";
+      var ppl = b.ppl || "(PPL belum dipilih)";
+      if (!b.ppl) warnings.push(hariTgl(iso) + ": blok ke-" + (bi + 1) + " belum memilih PPL.");
+      if (items.length) items.push({ type: "gap" });
+      if (b.kampung !== loc) {
+        if (!visited[b.kampung]) {
+          var visum = (state.visum && state.visum[b.kampung]) || "Kepala Kampung";
+          items.push({ type: "bullet", text: "Kami berangkat " + (firstTravel ? "dari Waisai " : "") + "menuju Kampung " + kk.kampung + (kk.distrik ? ", Distrik " + kk.distrik : "") + " menggunakan transportasi " + transport + "." });
+          items.push({ type: "bullet", text: "Sesampainya di lokasi, kami menemui aparat kampung yaitu " + visum + " " + kk.kampung + "." });
+          items.push({ type: "bullet", text: "Kami meminta visum surat tugas serta menyampaikan maksud dan tujuan ke " + visumLower(visum) + " kemudian kami menanyakan keberadaan dan posisi rumah tangga sampel yang ada di SLS tersebut." });
+          visited[b.kampung] = true; firstTravel = false;
+        } else {
+          items.push({ type: "bullet", text: "Kami kembali menuju Kampung " + kk.kampung + " menggunakan transportasi " + transport + " untuk melanjutkan pendataan." });
+        }
+        loc = b.kampung;
+        items.push({ type: "bullet", text: "PPL " + ppl + " melakukan pendataan sampel yang ada di " + slsTxt + "." });
+      } else if (first) {
+        items.push({ type: "bullet", text: "PPL " + ppl + " melanjutkan pendataan sampel yang ada di " + slsTxt + "." });
+      } else {
+        items.push({ type: "bullet", text: "Kami melanjutkan pendataan sampel yang ada di " + slsTxt + "." });
+        items.push({ type: "bullet", text: "PPL " + ppl + " melakukan pendataan sampel yang ada di " + slsTxt + "." });
+      }
+      first = false;
+      var ok = res.filter(function (r) { return r.ok; }).length;
+      res.forEach(function (r, i) { if (r.incomplete) warnings.push(hariTgl(iso) + ", PPL " + ppl + ": sampel no. " + (i + 1) + " belum lengkap (sampel pengganti belum dipilih / KBLI kosong di spreadsheet)."); });
+      var jumlah = ok === res.length ? ok + " responden" : ok + " dari " + res.length + " sampel";
+      items.push({ type: "bullet", text: "Kami menjelaskan maksud dan tujuan pendataan kepada responden, mengidentifikasi keberadaan rumah tangga dan UTP melalui aplikasi FASIH mobile. Kami berhasil melakukan pendataan " + jumlah + " dengan rincian sebagai berikut." });
+      res.forEach(function (r, i) { items.push({ type: "num", n: i + 1, text: r.text }); });
+      if (!res.length) warnings.push(hariTgl(iso) + ", PPL " + ppl + ": belum ada sampel.");
+      if (lastIdx[b.kampung] === seq) {
+        var all = uniq(slsK[b.kampung] || []).sort(slsSort);
+        items.push({ type: "gap" });
+        items.push({ type: "bullet", text: "Pendataan " + NAMA_SURVEI + " di " + (all.length ? all.join(", ") + ", " : "") + "Kampung " + kk.kampung + " telah selesai." });
+      }
+    });
+    String(d.catatan || "").split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean).forEach(function (s, i) {
+      if (i === 0 && items.length) items.push({ type: "gap" });
+      items.push({ type: "bullet", text: s });
+    });
+    if (d.kembali === undefined ? di === dates.length - 1 : d.kembali) {
+      if (items.length) items.push({ type: "gap" });
+      items.push({ type: "bullet", text: "Kami kembali ke Waisai menggunakan transportasi " + transport + "." });
+      loc = "Waisai";
+    }
+    if (!items.length) warnings.push(hariTgl(iso) + ": belum ada kegiatan/catatan.");
+    days.push({ heading: hariTgl(iso), items: items });
+  });
+
+  if (!state.pml) warnings.unshift("Nama PML belum dipilih.");
+  if (!state.noST) warnings.unshift("Nomor Surat Tugas belum diisi.");
+  if (!dates.length) warnings.unshift("Tanggal tugas belum valid.");
+  return {
+    tujuan: trimDot(state.tujuan) ? trimDot(state.tujuan) + "." : "",
+    tanggal: dates.length ? tglIndo(dates[0]) + " s.d. " + tglIndo(dates[dates.length - 1]) : "",
+    perihal: PERIHAL,
+    noST: (state.noST || "").trim(),
+    tim: tim,
+    days: days,
+    warnings: warnings
+  };
+}
+
+/* ---------- DOCX ---------- */
+function buildDocx(D, m) {
+  var FONT = "Arial", SZ = 22;
+  var W1 = 5341, W2 = 4152, WT = W1 + W2;
+  var LBL_TAB = 1750, VAL = 1985;
+  function run(t, o) { o = o || {}; return new D.TextRun({ text: t, bold: !!o.bold, font: FONT, size: SZ }); }
+  function p(children, o) {
+    o = o || {};
+    return new D.Paragraph(Object.assign({ children: children, spacing: { after: 0, line: 276 } }, o));
+  }
+  function labelPara(label, value) {
+    return p([run(label + "\t:\t" + value)], {
+      alignment: D.AlignmentType.LEFT,
+      indent: { left: VAL, hanging: VAL },
+      tabStops: [{ type: D.TabStopType.LEFT, position: LBL_TAB }, { type: D.TabStopType.LEFT, position: VAL }]
+    });
+  }
+  var b = { style: D.BorderStyle.SINGLE, size: 4, color: "000000" };
+  var borders = { top: b, bottom: b, left: b, right: b };
+  var margins = { top: 60, bottom: 60, left: 108, right: 108 };
+  function cell(children, o) {
+    return new D.TableCell(Object.assign({ children: children, borders: borders, margins: margins, width: { size: W1, type: D.WidthType.DXA } }, o || {}));
+  }
+
+  // Row 2/3 col 2: names
+  var names = [p([run("Nama :")])];
+  m.tim.forEach(function (n, i) {
+    names.push(p([run((i + 1) + ".\t" + n)], { indent: { left: 360, hanging: 360 }, tabStops: [{ type: D.TabStopType.LEFT, position: 360 }] }));
+    if (i < m.tim.length - 1) names.push(p([run("")]));
+  });
+  // Row 4 col 2: signatures
+  var sign = [p([run("Tanda Tangan:")])];
+  m.tim.forEach(function (n, i) {
+    sign.push(p([run((i + 1) + ".")], { spacing: { before: 0, after: 0, line: 276 } }));
+    sign.push(p([run("")])); sign.push(p([run("")]));
+  });
+
+  // Row 7: report
+  var rep = [];
+  m.days.forEach(function (d, di) {
+    if (di) rep.push(p([run("")]));
+    rep.push(p([run(d.heading, { bold: true })], { spacing: { after: 60, line: 276 } }));
+    d.items.forEach(function (it) {
+      if (it.type === "gap") rep.push(p([run("")]));
+      else if (it.type === "bullet") rep.push(p([run(it.text)], { alignment: D.AlignmentType.JUSTIFIED, numbering: { reference: "bul", level: 0 } }));
+      else rep.push(p([run(it.n + ".\t" + it.text)], {
+        alignment: D.AlignmentType.JUSTIFIED,
+        indent: { left: 1080, hanging: 360 },
+        tabStops: [{ type: D.TabStopType.LEFT, position: 1080 }]
+      }));
+    });
+  });
+  if (!rep.length) rep.push(p([run("")]));
+
+  var rows = [
+    new D.TableRow({ children: [cell([p([run("LAPORAN PERJALANAN DINAS", { bold: true })], { alignment: D.AlignmentType.CENTER, spacing: { before: 60, after: 60, line: 276 } })], { columnSpan: 2, width: { size: WT, type: D.WidthType.DXA } })] }),
+    new D.TableRow({ children: [
+      cell([labelPara("Tujuan", m.tujuan)]),
+      cell(names, { rowSpan: 2, width: { size: W2, type: D.WidthType.DXA } })
+    ] }),
+    new D.TableRow({ children: [cell([labelPara("Tanggal Tugas", m.tanggal)])] }),
+    new D.TableRow({ children: [
+      cell([labelPara("Perihal", m.perihal)]),
+      cell(sign, { width: { size: W2, type: D.WidthType.DXA } })
+    ] }),
+    new D.TableRow({ children: [cell([labelPara("Dasar Hukum", "Surat Tugas Nomor " + m.noST)], { columnSpan: 2, width: { size: WT, type: D.WidthType.DXA } })] }),
+    new D.TableRow({ children: [cell([p([run("Laporan Kegiatan", { bold: true })], { alignment: D.AlignmentType.CENTER })], { columnSpan: 2, width: { size: WT, type: D.WidthType.DXA } })] }),
+    new D.TableRow({ children: [cell(rep, { columnSpan: 2, width: { size: WT, type: D.WidthType.DXA } })] })
+  ];
+
+  return new D.Document({
+    styles: { default: { document: { run: { font: FONT, size: SZ } } } },
+    numbering: { config: [{ reference: "bul", levels: [{ level: 0, format: D.LevelFormat.BULLET, text: "\u2022", alignment: D.AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] }] },
+    sections: [{
+      properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1247, bottom: 1247, left: 1247, right: 1134 } } },
+      children: [new D.Table({ width: { size: WT, type: D.WidthType.DXA }, columnWidths: [W1, W2], rows: rows })]
+    }]
+  });
+}
+
+if (typeof module !== "undefined") module.exports = { buildModel: buildModel, buildDocx: buildDocx, dateRange: dateRange, tujuanFromKampung: tujuanFromKampung, NONE: NONE };
+
+</script>
+<script>
+(function () {
+"use strict";
+/* =====================================================================
+   LINK SPREADSHEET — ganti dengan link Google Sheets Anda.
+   Contoh: "https://docs.google.com/spreadsheets/d/1AbCdEf.../edit"
+   Spreadsheet harus punya sheet "Petugas" dan "Sampel" (lihat template).
+   ===================================================================== */
+var SPREADSHEET_URL = "";
+
+var LS_KEY = "spdt-ntp-2026-laporan-v1";
+var $ = function (id) { return document.getElementById(id); };
+function el(tag, attrs, kids) {
+  var e = document.createElement(tag);
+  if (attrs) Object.keys(attrs).forEach(function (k) {
+    if (k === "class") e.className = attrs[k];
+    else if (k === "text") e.textContent = attrs[k];
+    else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), attrs[k]);
+    else if (attrs[k] !== undefined && attrs[k] !== null && attrs[k] !== false) e.setAttribute(k, attrs[k]);
+  });
+  (kids || []).forEach(function (c) { if (c != null) e.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+  return e;
+}
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+var data = { petugas: [], sampel: [], kbli: [], file: "" };
+var state = { pml: "", tujuan: "", tujuanAuto: true, kampungTugas: [], tglAwal: "", tglAkhir: "", noST: "", transport: "perahu", days: {}, visum: {} };
+
+/* ---------- persistence ---------- */
+function save() { try { localStorage.setItem(LS_KEY, JSON.stringify({ data: data, state: state })); } catch (e) {} }
+function load() {
+  try {
+    var s = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+    if (s && s.data && s.state) { data = s.data; state = Object.assign(state, s.state); }
+  } catch (e) {}
+}
+
+/* ---------- spreadsheet parsing ---------- */
+function norm(s) { return String(s == null ? "" : s).toLowerCase().replace(/[^a-z0-9]/g, ""); }
+function cleanName(s, prefix) {
+  s = String(s == null ? "" : s).replace(/\s+/g, " ").trim();
+  if (prefix) s = s.replace(new RegExp("^" + prefix + "\\s+", "i"), "");
+  return s;
+}
+function properCase(s) {
+  // Hanya mengubah teks yang SELURUHNYA huruf besar; yang sudah Proper di spreadsheet dibiarkan apa adanya.
+  s = String(s == null ? "" : s);
+  if (!s || s !== s.toUpperCase() || s === s.toLowerCase()) return s;
+  return s.toLowerCase().replace(/(^|[\s\-\/'(])([a-z])/g, function (m, a, b) { return a + b.toUpperCase(); });
+}
+function pickSheet(wb, keys) {
+  var names = wb.SheetNames;
+  for (var k = 0; k < keys.length; k++)
+    for (var i = 0; i < names.length; i++) if (norm(names[i]) === keys[k]) return wb.Sheets[names[i]];
+  for (k = 0; k < keys.length; k++)
+    for (i = 0; i < names.length; i++) if (norm(names[i]).indexOf(keys[k]) >= 0) return wb.Sheets[names[i]];
+  return null;
+}
+function tableFrom(sheet, spec) {
+  // spec: {field:[aliases...]}; returns rows of {field:value}
+  if (!sheet) return [];
+  var rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false });
+  var fields = Object.keys(spec), hdr = -1, map = {};
+  for (var r = 0; r < Math.min(rows.length, 15) && hdr < 0; r++) {
+    var cells = rows[r].map(norm), m = {}, hits = 0;
+    fields.forEach(function (f) {
+      var idx = -1;
+      spec[f].forEach(function (a) { if (idx < 0) idx = cells.indexOf(a); });
+      if (idx < 0) spec[f].forEach(function (a) { if (idx < 0) cells.forEach(function (c, ci) { if (idx < 0 && c && c.indexOf(a) === 0) idx = ci; }); });
+      if (idx >= 0) { m[f] = idx; hits++; }
+    });
+    if (hits >= 2) { hdr = r; map = m; }
+  }
+  if (hdr < 0) return [];
+  var out = [];
+  for (r = hdr + 1; r < rows.length; r++) {
+    var o = {}, any = false;
+    fields.forEach(function (f) { o[f] = map[f] !== undefined ? String(rows[r][map[f]] == null ? "" : rows[r][map[f]]).trim() : ""; if (o[f]) any = true; });
+    if (any) { o._row = r + 1; out.push(o); }
+  }
+  return out;
+}
+function parseWorkbook(wb, fname) {
+  var pet = tableFrom(pickSheet(wb, ["petugas", "tim", "pmlppl"]), { pml: ["pml", "namapml"], ppl: ["ppl", "namappl"] });
+  var lastPml = "";
+  pet = pet.map(function (r) { var pml = cleanName(r.pml) || lastPml; lastPml = pml; return { pml: pml, ppl: cleanName(r.ppl) }; }).filter(function (r) { return r.pml; });
+  var smp = tableFrom(pickSheet(wb, ["sampel", "sample", "dsrt"]), {
+    id: ["idsampel", "id", "kodesampel", "no", "nourut"], distrik: ["distrik", "kecamatan", "kec"],
+    kampung: ["kampung", "desa", "desakelurahan", "kelurahan"], sls: ["sls", "namasls", "rtrw"],
+    nama: ["namasampel", "namakrt", "namaruta", "namaresponden", "nama"], jenis: ["jenis", "status", "jenissampel"],
+    kbli: ["kodekbli", "kbli"], judulKbli: ["judulkbli", "deskripsikbli", "uraiankbli"], subsektor: ["subsektor", "sektor"]
+  });
+  var seen = {};
+  smp = smp.filter(function (r) { return r.nama; }).map(function (r, i) {
+    var id = r.id ? "id:" + r.id : "row:" + r._row;
+    if (seen[id]) id = id + "#" + i; seen[id] = 1;
+    var k = String(r.kbli || "").replace(/\s/g, ""); if (/^\d{1,4}$/.test(k)) k = k.padStart(5, "0");
+    return { id: id, distrik: properCase(cleanName(r.distrik, "distrik")), kampung: properCase(cleanName(r.kampung, "kampung")), sls: cleanName(r.sls, "sls"), nama: cleanName(r.nama), jenis: cleanName(r.jenis),
+      kbli: k, judulKbli: cleanName(r.judulKbli), subsektor: cleanName(r.subsektor) };
+  });
+  return { petugas: pet, sampel: smp, kbli: [], file: fname };
+}
+function sheetId(url) { var m = String(url).match(/\/d\/([A-Za-z0-9_-]{20,})/); return m ? m[1] : (/^[A-Za-z0-9_-]{20,}$/.test(url) ? url : ""); }
+function b64ToBytes(b64) { var bin = atob(String(b64).replace(/\s/g, "")), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+function findB64(p) {
+  if (!p) return "";
+  if (typeof p === "string") { try { return findB64(JSON.parse(p)); } catch (e) { return /^[A-Za-z0-9+/=\s]{200,}$/.test(p) ? p : ""; } }
+  if (typeof p.content === "string") return p.content;
+  if (typeof p.data === "string") return p.data;
+  if (Array.isArray(p.content)) for (var i = 0; i < p.content.length; i++) { var x = findB64(p.content[i].text || p.content[i]); if (x) return x; }
+  return "";
+}
+var loading = false, retried = false;
+var LINK_KEY = LS_KEY + "-link";
+function getSheetUrl() {
+  if (SPREADSHEET_URL) return SPREADSHEET_URL;
+  try { return localStorage.getItem(LINK_KEY) || ""; } catch (e) { return ""; }
+}
+function viaClaude(id, refresh) {
+  return window.claude.use("mcp").then(function (mcp) {
+    if (!mcp) throw { code: "not_granted" };
+    return mcp.callTool("Google Drive", "download_file_content",
+      { fileId: id, exportMimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+      { cache: { staleTime: refresh ? 0 : 10 * 60 * 1000, gcTime: 24 * 3600 * 1000, refresh: !!refresh } });
+  }).then(function (res) {
+    var b64 = findB64(res.payload) || findB64(res);
+    if (!b64) throw { code: "tool_error", message: "Isi file tidak terbaca." };
+    return { wb: XLSX.read(b64ToBytes(b64), { type: "array" }), title: (res.payload && res.payload.title) || "Spreadsheet", at: (res.cache && res.cache.storedAt) || Date.now() };
+  });
+}
+function fetchCsvSheet(id, name, refresh) {
+  var url = "https://docs.google.com/spreadsheets/d/" + id + "/gviz/tq?tqx=out:csv&headers=1&sheet=" + encodeURIComponent(name);
+  return fetch(url, { cache: refresh ? "reload" : "default" }).then(function (r) {
+    if (!r.ok) throw { code: "http", message: "sheet " + name + ": HTTP " + r.status };
+    return r.text();
+  }, function (e) { console.error("fetch gagal:", url, e); throw { code: "network", message: name }; }).then(function (t) {
+    if (/^\s*</.test(t)) { console.error("Respons HTML untuk sheet " + name + ":", t.slice(0, 300)); throw { code: /sign in|accounts\.google|masuk/i.test(t) ? "login" : "html", message: name }; }
+    var w = XLSX.read(t, { type: "string", raw: true });
+    return w.Sheets[w.SheetNames[0]];
+  });
+}
+var jsonpSeq = 0;
+function jsonpSheet(id, name) {
+  // Memuat data lewat tag <script> (tidak terkena aturan CORS, jadi jalan juga dari file:// maupun GitHub Pages)
+  return new Promise(function (resolve, reject) {
+    var cb = "__gviz_" + (++jsonpSeq) + "_" + Date.now(), sc = document.createElement("script"), done = false;
+    function clean() { done = true; clearTimeout(tm); try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (sc.parentNode) sc.parentNode.removeChild(sc); }
+    var tm = setTimeout(function () { if (!done) { clean(); reject({ code: "login", message: name }); } }, 15000);
+    window[cb] = function (resp) {
+      if (done) return; clean();
+      if (!resp || resp.status !== "ok" || !resp.table) {
+        var em = resp && resp.errors && resp.errors[0] ? (resp.errors[0].detailed_message || resp.errors[0].message) : "respons tidak valid";
+        return reject({ code: "http", message: "sheet " + name + ": " + em });
+      }
+      var rows = [resp.table.cols.map(function (c) { return c.label || ""; })];
+      resp.table.rows.forEach(function (r) {
+        rows.push((r.c || []).map(function (c) { return c ? (c.f != null && c.f !== "" ? c.f : (c.v == null ? "" : c.v)) : ""; }));
+      });
+      resolve(XLSX.utils.aoa_to_sheet(rows));
+    };
+    sc.onerror = function () { if (!done) { clean(); reject({ code: "network", message: name }); } };
+    sc.src = "https://docs.google.com/spreadsheets/d/" + id + "/gviz/tq?headers=1&tqx=responseHandler:" + cb + "&sheet=" + encodeURIComponent(name);
+    document.head.appendChild(sc);
+  });
+}
+function viaSheets(id, refresh) {
+  function book(r) {
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, r[0], "Petugas");
+    XLSX.utils.book_append_sheet(wb, r[1], "Sampel");
+    return { wb: wb, title: "Google Sheets", at: Date.now() };
+  }
+  return Promise.all([jsonpSheet(id, "Petugas"), jsonpSheet(id, "Sampel")]).then(book, function (e1) {
+    console.warn("Jalur script gagal, mencoba fetch CSV:", e1);
+    return Promise.all([fetchCsvSheet(id, "Petugas", refresh), fetchCsvSheet(id, "Sampel", refresh)]).then(book, function (e2) { throw (e2 && e2.code === "network") ? e1 : e2; });
+  });
+}
+function applyWorkbook(wb, title, at) {
+  var d = parseWorkbook(wb, title);
+  if (!d.petugas.length && !d.sampel.length) throw { code: "parse", message: "Sheet Petugas/Sampel tidak terbaca. Cek nama sheet dan judul kolom." };
+  d.loadedAt = at || Date.now();
+  data = d; loading = false; retried = false;
+  if (state.pml && pmlList().indexOf(state.pml) < 0) state.pml = "";
+  migrateKampungKeys();
+  save(); renderAll();
+}
+function migrateKampungKeys() {
+  // Isian yang tersimpan di browser memuat nama kampung dari data lama (mis. HURUF BESAR).
+  // Cocokkan tanpa membedakan huruf besar/kecil dengan data terbaru, lalu pakai ejaan dari spreadsheet.
+  var map = {};
+  kampungAll().forEach(function (k) { map[k.toLowerCase()] = k; });
+  function fix(k) { return (k && map[k.toLowerCase()]) || k; }
+  state.kampungTugas = (state.kampungTugas || []).map(fix);
+  Object.keys(state.days || {}).forEach(function (iso) {
+    ((state.days[iso] && state.days[iso].blocks) || []).forEach(function (b) { if (b.kampung) b.kampung = fix(b.kampung); });
+  });
+  var v = {};
+  Object.keys(state.visum || {}).forEach(function (k) { v[fix(k)] = state.visum[k]; });
+  state.visum = v;
+  if (state.tujuanAuto && state.kampungTugas.length) state.tujuan = tujuanFromKampung(state.kampungTugas);
+}
+function loadFromFile(file) {
+  if (!file) return;
+  showStat("Membaca file " + file.name + "…");
+  var fr = new FileReader();
+  fr.onload = function () {
+    try { applyWorkbook(XLSX.read(new Uint8Array(fr.result), { type: "array" }), file.name, Date.now()); }
+    catch (e) { showStat("Gagal membaca file: " + ((e && e.message) || "format tidak dikenali") + ".", true); }
+  };
+  fr.onerror = function () { showStat("File tidak bisa dibaca.", true); };
+  fr.readAsArrayBuffer(file);
+}
+function loadFromDrive(refresh) {
+  var id = sheetId(getSheetUrl());
+  if (!id) { showStat("Link spreadsheet belum diisi. Tempel link Google Sheets di kolom di atas.", true); return; }
+  loading = true; showStat("Memuat data dari Google Sheets…");
+  var useClaude = !!(window.claude && window.claude.use);
+  (useClaude ? viaClaude(id, refresh) : viaSheets(id, refresh)).then(function (res) {
+    applyWorkbook(res.wb, res.title, res.at);
+  }).catch(function (err) {
+    loading = false;
+    var c = err && err.code;
+    if (err && err.retryable && !retried) { retried = true; setTimeout(function () { loadFromDrive(refresh); }, (err.retryAfterMs || 1500) + Math.random() * 1000); return; }
+    var msg = {
+      network: "Browser gagal menghubungi Google Sheets (sheet " + (err && err.message) + "). Penyebab umum: spreadsheet belum dibagikan ke \"Siapa saja yang memiliki link\", file asli berformat .xlsx (bukan Google Sheets), atau halaman dibuka lewat file:// dan diblokir. Alternatif: klik \"Unggah file .xlsx\".",
+      login: "Google meminta login — spreadsheet belum dibagikan ke \"Siapa saja yang memiliki link\" (Viewer).",
+      html: "Google tidak mengembalikan data untuk sheet " + (err && err.message) + ". Cek nama sheet (persis Petugas dan Sampel) dan pastikan file berupa Google Sheets asli, bukan .xlsx yang diunggah ke Drive.",
+      http: "Google Sheets menolak permintaan" + (err && err.message ? " (" + err.message + ")" : "") + ". Cek nama sheet (Petugas, Sampel) dan pengaturan berbagi.",
+      server_not_connected: "Google Drive belum terhubung di akun Claude Anda. Tambahkan lewat claude.ai → Settings → Connectors, lalu klik Muat ulang.",
+      needs_reauth: "Koneksi Google Drive kedaluwarsa. Hubungkan ulang di claude.ai → Settings → Connectors, lalu klik Muat ulang.",
+      selection_required: "Ada lebih dari satu koneksi Google Drive — pilih salah satu saat diminta, lalu klik Muat ulang.",
+      approval_required: "Halaman perlu izin membaca Google Drive. Klik Muat ulang lalu pilih Izinkan.",
+      not_in_manifest: "Izin Google Drive untuk halaman ini ditolak/dimatikan.",
+      blocked_by_policy: "Akses Google Drive diblokir oleh kebijakan organisasi.",
+      not_granted: "Halaman ini tidak mendapat akses ke koneksi Google Drive di tampilan ini. Buka halaman di claude.ai.",
+      capability_disabled: "Halaman ini tidak mendapat akses ke koneksi Google Drive di tampilan ini. Buka halaman di claude.ai.",
+      tool_error: "Spreadsheet tidak bisa dibuka. Pastikan link benar dan akun Google Anda punya akses ke file tersebut.",
+      server_unavailable: "Google Drive sedang tidak merespons. Coba Muat ulang sebentar lagi."
+    }[c] || ("Gagal memuat spreadsheet" + (err && err.message ? ": " + err.message : "."));
+    showStat(msg + (data.file ? " (Menampilkan data terakhir yang tersimpan.)" : ""), true);
+  });
+}
+function showStat(msg, bad) {
+  var box = $("dataStat"); box.innerHTML = "";
+  if (msg) box.appendChild(el("div", { class: bad ? "msg bad" : "msg", text: msg }));
+  if (!data.file) return;
+  box.appendChild(el("span", { class: "pill", text: "📄 " + data.file }));
+  if (data.loadedAt) box.appendChild(el("span", { class: "pill", text: "Diperbarui " + new Date(data.loadedAt).toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) }));
+  box.appendChild(el("span", { class: "pill", text: pmlList().length + " PML" }));
+  box.appendChild(el("span", { class: "pill", text: data.petugas.filter(function (r) { return r.ppl; }).length + " PPL" }));
+  box.appendChild(el("span", { class: "pill" + (data.sampel.length ? "" : " bad"), text: data.sampel.length + " sampel" }));
+}
+
+/* ---------- helpers on data ---------- */
+function pmlList() { var o = []; data.petugas.forEach(function (r) { if (o.indexOf(r.pml) < 0) o.push(r.pml); }); return o; }
+function samplesForPml() { return data.sampel; }
+function kampungAll() {
+  var o = [], seen = {};
+  samplesForPml().forEach(function (s) { var k = kampungKey(s.distrik, s.kampung); if (s.kampung && !seen[k]) { seen[k] = 1; o.push(k); } });
+  return o;
+}
+function kampungOptions() { return state.kampungTugas.length ? state.kampungTugas : kampungAll(); }
+function usedSampleIds(except) {
+  var used = {};
+  Object.keys(state.days).forEach(function (iso) {
+    (state.days[iso].blocks || []).forEach(function (b) { (b.entries || []).forEach(function (e) {
+      if (e === except) return;
+      if (e.sampel) used[e.sampel] = 1; if (e.pengganti && e.pengganti !== NONE) used[e.pengganti] = 1;
+    }); });
+  });
+  return used;
+}
+
+/* ---------- combobox ---------- */
+function combo(opts) {
+  // opts: {options:[{value,label,hint,cls}], value, placeholder, onChange}
+  var wrap = el("div", { class: "cb" });
+  var inp = el("input", { type: "text", placeholder: opts.placeholder || "Ketik untuk mencari…", autocomplete: "off" });
+  var list = el("div", { class: "cb-list" });
+  wrap.appendChild(inp); wrap.appendChild(el("span", { class: "caret", text: "▼" })); wrap.appendChild(list);
+  function labelOf(v) { for (var i = 0; i < opts.options.length; i++) if (opts.options[i].value === v) return opts.options[i].label; return ""; }
+  inp.value = labelOf(opts.value);
+  var shown = [], act = -1;
+  function draw() {
+    var q = inp.value.toLowerCase().trim(), qs = q.split(/\s+/).filter(Boolean);
+    if (labelOf(opts.value) === inp.value) qs = [];
+    shown = opts.options.filter(function (o) { var h = (o.label + " " + (o.hint || "")).toLowerCase(); return qs.every(function (w) { return h.indexOf(w) >= 0; }); }).slice(0, 150);
+    list.innerHTML = "";
+    if (!shown.length) list.appendChild(el("div", { class: "cb-empty", text: "Tidak ditemukan" }));
+    shown.forEach(function (o, i) {
+      var d = el("div", { class: "cb-opt" + (i === act ? " act" : "") + (o.cls ? " " + o.cls : "") });
+      d.innerHTML = esc(o.label) + (o.hint ? "<small>" + o.hint + "</small>" : "");
+      d.addEventListener("mousedown", function (ev) { ev.preventDefault(); choose(o); });
+      list.appendChild(d);
+    });
+  }
+  function choose(o) { wrap.classList.remove("open"); inp.value = o.label; inp.blur(); if (o.value !== opts.value) opts.onChange(o.value); }
+  inp.addEventListener("focus", function () { act = -1; wrap.classList.add("open"); inp.select(); draw(); });
+  inp.addEventListener("input", function () { act = 0; draw(); });
+  inp.addEventListener("blur", function () { setTimeout(function () { wrap.classList.remove("open"); inp.value = labelOf(opts.value); }, 120); });
+  inp.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowDown") { act = Math.min(act + 1, shown.length - 1); draw(); e.preventDefault(); }
+    else if (e.key === "ArrowUp") { act = Math.max(act - 1, 0); draw(); e.preventDefault(); }
+    else if (e.key === "Enter") { if (shown[act]) choose(shown[act]); e.preventDefault(); }
+    else if (e.key === "Escape") { inp.blur(); }
+  });
+  return wrap;
+}
+function sel(options, value, onChange, placeholder) {
+  var s = el("select", { onchange: function () { onChange(s.value); } });
+  if (placeholder !== undefined) s.appendChild(el("option", { value: "", text: placeholder }));
+  options.forEach(function (o) { var v = typeof o === "string" ? o : o.value, t = typeof o === "string" ? o : o.label; s.appendChild(el("option", { value: v, text: t })); });
+  s.value = value || "";
+  return s;
+}
+function field(label, ctrl) { return el("div", {}, [el("label", { class: "f", text: label }), ctrl]); }
+
+/* ---------- render: identity ---------- */
+function renderIdentity() {
+  var ps = $("pml"); ps.innerHTML = "";
+  ps.appendChild(el("option", { value: "", text: pmlList().length ? "— pilih PML —" : "(unggah spreadsheet dulu)" }));
+  pmlList().forEach(function (p) { ps.appendChild(el("option", { value: p, text: p })); });
+  ps.value = state.pml;
+  $("noST").value = state.noST; $("tujuan").value = state.tujuan;
+  $("tglAwal").value = state.tglAwal; $("tglAkhir").value = state.tglAkhir; $("transport").value = state.transport;
+
+  var tb = $("teamBox"); tb.innerHTML = "";
+  if (state.pml) {
+    var t = el("div", { class: "team" });
+    t.appendChild(el("span", {}, [el("b", { text: "PML " }), state.pml]));
+    teamOf(data, state.pml).forEach(function (p) { t.appendChild(el("span", {}, [el("b", { text: "PPL " }), p])); });
+    tb.appendChild(t);
+  }
+  var kb = $("kampungBox"); kb.innerHTML = "";
+  var all = kampungAll();
+  if (!all.length) { kb.appendChild(el("div", { class: "muted", text: "Daftar kampung diambil dari sheet Sampel." })); return; }
+  var groups = {}, order = [];
+  all.forEach(function (k) { var d = splitKey(k).distrik || "(tanpa distrik)"; if (!groups[d]) { groups[d] = []; order.push(d); } groups[d].push(k); });
+  order.forEach(function (d) {
+    kb.appendChild(el("div", { class: "distrik-lbl", text: "Distrik " + d }));
+    var c = el("div", { class: "chips" });
+    groups[d].forEach(function (k) {
+      var on = state.kampungTugas.indexOf(k) >= 0;
+      var idx = state.kampungTugas.indexOf(k);
+      var cb = el("input", { type: "checkbox" }); cb.checked = on;
+      var chip = el("label", { class: "chip" + (on ? " on" : "") }, [cb, (on ? (idx + 1) + ". " : "") + splitKey(k).kampung]);
+      cb.addEventListener("change", function () {
+        if (cb.checked) state.kampungTugas.push(k); else state.kampungTugas = state.kampungTugas.filter(function (x) { return x !== k; });
+        if (state.tujuanAuto) state.tujuan = tujuanFromKampung(state.kampungTugas);
+        save(); renderIdentity(); renderDays(); schedule();
+      });
+      c.appendChild(chip);
+    });
+    kb.appendChild(c);
+  });
+}
+
+/* ---------- render: days ---------- */
+function newEntry() { return { sampel: "", eligible: "ya", alasan: ALASAN[0], alasanLain: "", pengganti: "", ditemui: "Bapak", ditemuiLain: "", kbli: "" }; }
+function sampleOpts(kampung, used, cur) {
+  var list = samplesForPml();
+  var inK = list.filter(function (s) { return !kampung || kampungKey(s.distrik, s.kampung) === kampung; });
+  return inK.map(function (s) {
+    var u = used[s.id] && s.id !== cur;
+    return { value: s.id, label: s.nama, hint: esc([s.sls, s.jenis, s.subsektor].filter(Boolean).join(" · ")) + (u ? ' · <span class="used">sudah dipakai</span>' : "") };
+  });
+}
+
+function renderDays() {
+  var box = $("days"); box.innerHTML = "";
+  var dates = dateRange(state.tglAwal, state.tglAkhir);
+  if (!dates.length) { box.appendChild(el("div", { class: "empty-state", text: "Isi tanggal awal dan akhir surat tugas — formulir harian akan muncul otomatis di sini." })); renderVisum(); return; }
+  if (!state.pml) box.appendChild(el("div", { class: "empty-state", style: "margin-bottom:12px", text: "Pilih Nama PML agar daftar PPL dan sampel terisi." }));
+  var team = teamOf(data, state.pml), kopts = kampungOptions();
+  dates.forEach(function (iso, di) {
+    var d = state.days[iso] || (state.days[iso] = { blocks: [], catatan: "" });
+    var card = el("div", { class: "day" });
+    card.appendChild(el("div", { class: "day-h" }, [el("b", { text: "Hari ke-" + (di + 1) + " · " + hariTgl(iso) }), el("span", { class: "tag", text: d.blocks.length + " PPL bertugas" })]));
+    var body = el("div", { class: "day-b" });
+    d.blocks.forEach(function (b, bi) {
+      var blk = el("div", { class: "blk" });
+      var h = el("div", { class: "blk-h" });
+      h.appendChild(field("PPL", sel(team, b.ppl, function (v) { b.ppl = v; changed(); }, "— pilih PPL —")));
+      h.appendChild(field("Kampung", sel(kopts.map(function (k) { var o = splitKey(k); return { value: k, label: o.kampung + (o.distrik ? " (" + o.distrik + ")" : "") }; }), b.kampung, function (v) { b.kampung = v; changed(true); }, "— pilih kampung —")));
+      h.appendChild(el("button", { class: "x", title: "Hapus blok PPL ini", text: "✕", onclick: function () { d.blocks.splice(bi, 1); changed(true); } }));
+      blk.appendChild(h);
+      b.entries.forEach(function (e, ei) {
+        var used = usedSampleIds(e);
+        var row = el("div", { class: "ent" });
+        row.appendChild(el("div", { class: "no", text: (ei + 1) + "." }));
+        var c = el("div");
+        var g = el("div", { class: "ent-g" });
+        g.appendChild(field("Nama sampel", combo({ options: sampleOpts(b.kampung, used, e.sampel), value: e.sampel, placeholder: b.kampung ? "Cari nama sampel…" : "Pilih kampung dulu / cari…", onChange: function (v) { e.sampel = v; changed(true); } })));
+        g.appendChild(field("Keterangan", sel([{ value: "ya", label: "Eligible" }, { value: "tidak", label: "Tidak eligible" }], e.eligible, function (v) { e.eligible = v; changed(true); })));
+        c.appendChild(g);
+        if (e.eligible === "tidak") {
+          var sb = el("div", { class: "sub" }), g2 = el("div", { class: "ent-g full" });
+          var alasanSel = sel(ALASAN.map(function (a) { return { value: a, label: a.charAt(0).toUpperCase() + a.slice(1) }; }).concat([{ value: "Lain", label: "Lainnya (tulis sendiri)…" }]), e.alasan, function (v) { e.alasan = v; changed(true); });
+          g2.appendChild(field("Alasan tidak eligible", alasanSel));
+          var po = [{ value: NONE, label: "Tidak dapat sampel pengganti", cls: "none" }].concat(sampleOpts(b.kampung, used, e.pengganti).filter(function (o) { return o.value !== e.sampel; }));
+          g2.appendChild(field("Sampel pengganti", combo({ options: po, value: e.pengganti, placeholder: "Cari sampel pengganti…", onChange: function (v) { e.pengganti = v; changed(true); } })));
+          sb.appendChild(g2);
+          if (e.alasan === "Lain") {
+            var ta = el("input", { type: "text", placeholder: "contoh: ruta tersebut sudah pindah ke kampung lain" }); ta.value = e.alasanLain || "";
+            ta.addEventListener("input", function () { e.alasanLain = ta.value; changed(); });
+            sb.appendChild(el("div", { style: "margin-top:8px" }, [field("Tulis alasan (dilanjutkan setelah kata \"dikarenakan\")", ta)]));
+          }
+          c.appendChild(sb);
+        }
+        var didata = e.eligible === "ya" || (e.pengganti && e.pengganti !== NONE);
+        if (didata) {
+          var sb2 = el("div", { class: "sub ok" }), g3 = el("div", { class: "ent-g full" });
+          g3.appendChild(field("Yang ditemui", sel([
+            { value: "Bapak", label: "Bapak [nama]" }, { value: "Ibu", label: "Ibu [nama]" }, { value: "Istri", label: "Istri dari keluarga [nama]" },
+            { value: "Suami", label: "Suami dari keluarga [nama]" }, { value: "Anak", label: "Anak dari keluarga [nama]" },
+            { value: "ART", label: "Anggota ruta dari keluarga [nama]" }, { value: "Lain", label: "Lainnya (tulis sendiri)…" }], e.ditemui, function (v) { e.ditemui = v; changed(true); })));
+          var rs = findSampel(data, e.eligible === "ya" ? e.sampel : e.pengganti);
+          var kInfo = el("div", { class: "kbli-info" });
+          if (rs && rs.kbli) { kInfo.appendChild(el("b", { text: rs.kbli + " — " + (rs.judulKbli || "") })); kInfo.appendChild(el("div", { class: "muted", text: rs.subsektor ? "Subsektor " + rs.subsektor : "" })); }
+          else kInfo.appendChild(el("span", { class: "muted", text: rs ? "KBLI kosong di spreadsheet untuk sampel ini" : "Pilih sampel dulu" }));
+          g3.appendChild(field("KBLI (dari spreadsheet)", kInfo));
+          sb2.appendChild(g3);
+          if (e.ditemui === "Lain") {
+            var tl = el("input", { type: "text", placeholder: "contoh: Ibu Mardiana" }); tl.value = e.ditemuiLain || "";
+            tl.addEventListener("input", function () { e.ditemuiLain = tl.value; changed(); });
+            sb2.appendChild(el("div", { style: "margin-top:8px" }, [field("Tulis yang ditemui (setelah \"kami menemui\")", tl)]));
+          }
+          c.appendChild(sb2);
+        }
+        row.appendChild(c);
+        row.appendChild(el("button", { class: "x", title: "Hapus sampel", text: "✕", onclick: function () { b.entries.splice(ei, 1); changed(true); } }));
+        blk.appendChild(row);
+      });
+      blk.appendChild(el("div", { class: "row-actions" }, [el("button", { class: "ghost", text: "+ Tambah sampel", onclick: function () { b.entries.push(newEntry()); changed(true); } })]));
+      body.appendChild(blk);
+    });
+    body.appendChild(el("div", { class: "row-actions" }, [el("button", { class: "ghost", text: "+ Tambah PPL yang mendata hari ini", onclick: function () {
+      var prev = d.blocks.length ? d.blocks[d.blocks.length - 1].kampung : lastKampungBefore(iso);
+      var nextPpl = team.filter(function (p) { return !d.blocks.some(function (x) { return x.ppl === p; }); })[0] || "";
+      d.blocks.push({ ppl: nextPpl, kampung: prev || "", entries: [newEntry()] }); changed(true);
+    } })]));
+    var cat = el("textarea", { rows: 2, placeholder: "Opsional — kegiatan lain hari ini, satu baris = satu poin. Contoh: Kami melakukan pemeriksaan dokumen dan rekapitulasi hasil pendataan." });
+    cat.value = d.catatan || "";
+    cat.addEventListener("input", function () { d.catatan = cat.value; changed(); });
+    body.appendChild(el("div", { style: "margin-top:10px" }, [field("Catatan / kegiatan tambahan", cat)]));
+    var kb = el("input", { type: "checkbox" }); kb.checked = d.kembali === undefined ? di === dates.length - 1 : d.kembali;
+    kb.addEventListener("change", function () { d.kembali = kb.checked; changed(); });
+    body.appendChild(el("label", { class: "check" }, [kb, "Tambahkan \"Kami kembali ke Waisai\" di akhir hari ini"]));
+    card.appendChild(body);
+    box.appendChild(card);
+  });
+  renderVisum();
+}
+function lastKampungBefore(iso) {
+  var last = "";
+  dateRange(state.tglAwal, state.tglAkhir).forEach(function (x) { if (x < iso && state.days[x]) state.days[x].blocks.forEach(function (b) { if (b.kampung) last = b.kampung; }); });
+  return last;
+}
+function renderVisum() {
+  var box = $("visumBox"); box.innerHTML = "";
+  var ks = visitedKampung(state);
+  if (!ks.length) { box.appendChild(el("div", { class: "empty-state", text: "Belum ada kampung yang dikunjungi pada laporan harian." })); return; }
+  var g = el("div", { class: "grid2" });
+  ks.forEach(function (k) {
+    var o = splitKey(k);
+    if (!state.visum[k]) state.visum[k] = "Kepala Kampung";
+    var inp = el("input", { type: "text", list: "visumList" }); inp.value = state.visum[k];
+    inp.addEventListener("input", function () { state.visum[k] = inp.value; changed(); });
+    g.appendChild(el("div", { class: "fld" }, [field("Kampung " + o.kampung + (o.distrik ? " — Distrik " + o.distrik : ""), inp)]));
+  });
+  box.appendChild(g);
+}
+
+/* ---------- preview ---------- */
+var timer = null;
+function schedule() { clearTimeout(timer); timer = setTimeout(renderPreview, 150); }
+function changed(rerender) { save(); if (rerender) renderDays(); else if (document.activeElement && document.activeElement.closest && !document.activeElement.closest("#visumBox")) renderVisumLight(); schedule(); }
+function renderVisumLight() { var n = visitedKampung(state).length; if ($("visumBox").querySelectorAll("input").length !== n) renderVisum(); }
+
+function renderPreview() {
+  var m = buildModel(state, data);
+  var names = m.tim.map(function (n, i) { return "<div>" + (i + 1) + ". " + esc(n) + "</div>" + (i < m.tim.length - 1 ? '<div class="gap"></div>' : ""); }).join("");
+  var sign = m.tim.map(function (n, i) { return "<div>" + (i + 1) + ".</div><div style='height:26px'></div>"; }).join("");
+  function lv(l, v) { return '<div class="lv"><span>' + l + "</span><span>:</span><span>" + esc(v) + "</span></div>"; }
+  var rep = m.days.map(function (d) {
+    var h = '<div class="dh">' + esc(d.heading) + "</div>", open = null;
+    d.items.forEach(function (it) {
+      if (it.type === "bullet") { if (open === "ol") { h += "</ol>"; open = null; } if (open !== "ul") { h += "<ul>"; open = "ul"; } h += "<li>" + esc(it.text) + "</li>"; }
+      else if (it.type === "num") { if (open === "ul") { h += "</ul>"; open = null; } if (open !== "ol") { h += "<ol>"; open = "ol"; } h += "<li>" + esc(it.text) + "</li>"; }
+      else { if (open) { h += "</" + open + ">"; open = null; } h += '<div class="gap"></div>'; }
+    });
+    if (open) h += "</" + open + ">";
+    return h;
+  }).join("");
+  $("paper").innerHTML =
+    "<table><colgroup><col style='width:56%'><col style='width:44%'></colgroup>" +
+    "<tr><td colspan=2 class='ctr'>LAPORAN PERJALANAN DINAS</td></tr>" +
+    "<tr><td>" + lv("Tujuan", m.tujuan) + "</td><td rowspan=2>Nama :" + names + "</td></tr>" +
+    "<tr><td>" + lv("Tanggal Tugas", m.tanggal) + "</td></tr>" +
+    "<tr><td>" + lv("Perihal", m.perihal) + "</td><td>Tanda Tangan:" + sign + "</td></tr>" +
+    "<tr><td colspan=2>" + lv("Dasar Hukum", "Surat Tugas Nomor " + m.noST) + "</td></tr>" +
+    "<tr><td colspan=2 class='ctr'>Laporan Kegiatan</td></tr>" +
+    "<tr><td colspan=2>" + (rep || "<span style='color:#888'>(laporan harian akan tampil di sini)</span>") + "</td></tr></table>";
+  var w = $("warns"); w.innerHTML = "";
+  m.warnings.slice(0, 40).forEach(function (t) { w.appendChild(el("li", { text: t })); });
+  w.style.display = m.warnings.length ? "" : "none";
+}
+
+/* ---------- downloads ---------- */
+var dlCap = null;
+try { if (window.claude && window.claude.use) window.claude.use("downloads").then(function (d) { dlCap = d; }, function () {}); } catch (e) {}
+function toast(msg, cls) { var t = $("toast"); t.textContent = msg; t.className = "toast " + (cls || ""); }
+function offer(filename, blob) {
+  if (dlCap) {
+    return dlCap.save({ filename: filename, data: blob }).then(function () { toast("Tersimpan: " + filename, "ok"); }, function (err) {
+      var c = err && err.code;
+      if (c === "declined") toast("Unduhan dibatalkan.", "");
+      else if (c === "rate_limited") toast("Masih ada konfirmasi unduhan yang terbuka — coba lagi sebentar.", "bad");
+      else { dlCap = null; fallback(filename, blob); }
+    });
+  }
+  fallback(filename, blob); return Promise.resolve();
+}
+function fallback(filename, blob) {
+  var a = el("a", { href: URL.createObjectURL(blob), download: filename });
+  document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  toast("Mengunduh " + filename + "…", "ok");
+}
+function slug(s) { return String(s || "").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_|_$/g, ""); }
+$("btnDl").addEventListener("click", function () {
+  var m = buildModel(state, data);
+  var btn = $("btnDl"); btn.disabled = true; toast("Menyusun dokumen…");
+  docx.Packer.toBlob(buildDocx(docx, m)).then(function (blob) {
+    return offer("Laporan_Perjalanan_Dinas_SPDT_NTP_2026_" + (slug(state.pml) || "PML") + ".docx", blob);
+  }).catch(function (e) { toast("Gagal membuat dokumen: " + e.message, "bad"); }).then(function () { btn.disabled = false; });
+});
+var resetArm = false;
+$("btnReset").addEventListener("click", function () {
+  var b = $("btnReset");
+  if (!resetArm) { resetArm = true; b.textContent = "Klik sekali lagi untuk menghapus semua isian"; b.style.color = "var(--bad)"; setTimeout(function () { resetArm = false; b.textContent = "Mulai baru (hapus isian)"; b.style.color = ""; }, 4000); return; }
+  resetArm = false; b.textContent = "Mulai baru (hapus isian)"; b.style.color = "";
+  state = { pml: "", tujuan: "", tujuanAuto: true, kampungTugas: [], tglAwal: "", tglAkhir: "", noST: "", transport: "perahu", days: {}, visum: {} };
+  save(); renderAll();
+});
+
+/* ---------- identity events ---------- */
+$("btnReload").addEventListener("click", function () { retried = false; loadFromDrive(true); });
+$("fileXlsx").addEventListener("change", function (e) { loadFromFile(e.target.files[0]); e.target.value = ""; });
+(function () {
+  var inp = $("sheetLink"), row = $("linkRow");
+  if (SPREADSHEET_URL) { row.style.display = "none"; return; }
+  inp.value = getSheetUrl();
+  $("btnLink").addEventListener("click", function () {
+    var v = inp.value.trim();
+    if (!sheetId(v)) { showStat("Link tidak dikenali. Tempel link Google Sheets lengkap (https://docs.google.com/spreadsheets/d/…).", true); return; }
+    try { localStorage.setItem(LINK_KEY, v); } catch (e) {}
+    retried = false; loadFromDrive(true);
+  });
+})();
+$("pml").addEventListener("change", function (e) {
+  state.pml = e.target.value; state.kampungTugas = [];
+  if (state.tujuanAuto) state.tujuan = "";
+  save(); renderIdentity(); renderDays(); schedule();
+});
+$("noST").addEventListener("input", function (e) { state.noST = e.target.value; save(); schedule(); });
+$("transport").addEventListener("input", function (e) { state.transport = e.target.value; save(); schedule(); });
+$("tujuan").addEventListener("input", function (e) { state.tujuan = e.target.value; state.tujuanAuto = !e.target.value; save(); schedule(); });
+$("btnTujuan").addEventListener("click", function () { state.tujuan = tujuanFromKampung(state.kampungTugas); state.tujuanAuto = true; $("tujuan").value = state.tujuan; save(); schedule(); });
+["tglAwal", "tglAkhir"].forEach(function (id) {
+  $(id).addEventListener("change", function (e) {
+    state[id] = e.target.value;
+    if (id === "tglAwal" && state.tglAwal && (!state.tglAkhir || state.tglAkhir < state.tglAwal)) { state.tglAkhir = state.tglAwal; $("tglAkhir").value = state.tglAkhir; }
+    save(); renderDays(); schedule();
+  });
+});
+
+function renderAll() { showStat(); renderIdentity(); renderDays(); renderPreview(); }
+load(); renderAll(); loadFromDrive(false);
+})();
+
+</script>
+</body>
+</html>
